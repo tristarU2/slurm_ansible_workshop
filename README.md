@@ -1,0 +1,2 @@
+- запуск playbook на localhost
+- forward - localhost:80 --> 8888
