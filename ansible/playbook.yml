@@ -2,19 +2,19 @@
 - name: "Install Nginx, Postgres & Ruby app on CentOS 7"
   hosts: all
   become: yes
-  vars:
-    ruby_version: 2.6.0
-    app_name: "ruby_app"
-    app_work_directory: "/opt/app"
-  environment: # https://docs.ansible.com/ansible/latest/user_guide/playbooks_environment.html
-    SECRET_KEY_BASE: "09b6c449602c40eed96def40b734a0b8"
-    RAILS_ENV: production
-    RAILS_LOG_TO_STDOUT: 1
-    DB_HOST: "127.0.0.1"
-    DB_PORT: "5432"
-    DB_NAME: "slurm"
-    DB_USER: "postgres"
-    DB_PASSWORD: "postgres"
+  # vars:
+    # ruby_version: 2.6.0
+    # app_name: "ruby_app"
+    # app_work_directory: "/opt/app"
+  # environment: # https://docs.ansible.com/ansible/latest/user_guide/playbooks_environment.html
+  #   SECRET_KEY_BASE: "09b6c449602c40eed96def40b734a0b8"
+  #   RAILS_ENV: production
+  #   RAILS_LOG_TO_STDOUT: 1
+  #   DB_HOST: "127.0.0.1"
+  #   DB_PORT: "5432"
+  #   DB_NAME: "slurm"
+  #   DB_USER: "postgres"
+  #   DB_PASSWORD: "postgres"
   
   roles:
     # - python3

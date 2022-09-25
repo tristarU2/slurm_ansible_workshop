@@ -1,2 +1,23 @@
 ---
 # vars file for ruby-app
+ruby_version: 2.6.0
+app_name: ruby_app
+app_work_directory: /opt/app
+
+os_env:
+  - key: SECRET_KEY_BASE
+    value: 09b6c449602c40eed96def40b734a0b8
+  - key: RAILS_ENV
+    value: production
+  - key: RAILS_LOG_TO_STDOUT
+    value: 1
+  - key: DB_HOST
+    value: 127.0.0.1
+  - key: DB_PORT
+    value: 5432
+  - key: DB_NAME
+    value: slurm
+  - key: DB_USER
+    value: postgres
+  - key: DB_PASSWORD
+    value: postgres

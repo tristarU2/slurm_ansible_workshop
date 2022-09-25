@@ -1,0 +1,71 @@
+
+# создать папку для приложения, если не существует /opt/app
+- name: "Create app directory - {{ app_work_directory }}"
+  ansible.builtin.file:
+    path: "{{ app_work_directory }}"
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: "0755"
+
+
+# скопировать папку с приложением в /opt/app
+- name: "Copy applications files into {{ app_work_directory }}"
+  ansible.builtin.copy:
+    src: files/
+    dest: "{{ app_work_directory }}/"
+    owner: vagrant
+    group: vagrant
+    mode: '0644'
+
+
+# # Сделать все бинарники исполняемыми
+# - name: "Make executable files in /bin"
+#   ansible.builtin.file:
+#     path: "{{ app_work_directory }}/bin/{{ item }}"
+#     mode: "0777"
+#   loop:
+#     - bundle
+#     - rails
+#     - rake
+#     - setup
+#     - spring
+#     - update
+#     - yarn
+
+# установить зависимости из каталога с приложением 
+# bundle config build.nokogiri --use-system-libraries
+# bundle install --clean --no-cache --without development
+# если не получиться, то запустить install так:
+# "bundle install --clean --no-cache --without development --gemfile={{ app_work_directory }}.Gemfile --path={{ app_work_directory }}"
+- name: "Istall dependencies"
+  become: no
+  ansible.builtin.command:
+    chdir: "{{ app_work_directory }}"
+    cmd: "{{ item }}"
+  loop:
+    # - 'gem install bundler -v "$(grep -A 1 "BUNDLED WITH" Gemfile.lock | tail -n 1)"'
+    - gem install bundler -v 1.16.2
+    # - "{{ app_work_directory }}/bin/bundle config build.nokogiri --use-system-libraries"
+    # - "{{ app_work_directory }}/bin/bundle install --clean  --no-cache --without development"
+
+    - "bundle config build.nokogiri --use-system-libraries"
+    - "bundle install --clean  --no-cache --without development"
+  ignore_errors: yes
+
+
+# скопировать из шаблона сервис systemd
+- name: "Copy service file"
+  ansible.builtin.template:
+    src: ruby-app.service.j2
+    dest: "/etc/systemd/system/{{ app_name }}.service"
+    owner: vagrant
+    group: vagrant
+    mode: "0644"
+
+# включить сервис и включить автозагрузку
+- name: "Service start"
+  ansible.builtin.service:
+    name: "{{ app_name }}"
+    state: started
+    enabled: yes

@@ -1,0 +1,8 @@
+# Установка переменных в /etc/environment
+- name: "Set environment from vars in /etc/environment"
+  ansible.builtin.lineinfile:
+    dest: /etc/environment
+    state: present
+    regexp: "^{{ item.key }}="
+    line: "{{ item.key }}={{ item.value }}"
+  with_items: "{{ os_env }}"

@@ -1,0 +1,12 @@
+# Установка NodeSource yum repository
+- name: "Add NodeSource yum repository"
+  ansible.builtin.shell: |
+    curl -sL https://rpm.nodesource.com/setup_10.x | sudo bash -
+
+# установка nodejs
+- name: "Install required dependencies for installing rbenv and ruby-build"
+  ansible.builtin.yum:
+    name:
+      - nodejs
+    state: latest
+    update_cache: yes
