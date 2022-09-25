@@ -1,0 +1,163 @@
+---
+# tasks file for ruby-app
+
+# Установка NodeSource yum repository
+# curl -sL https://rpm.nodesource.com/setup_10.x | sudo bash -
+- name: "Add NodeSource yum repository"
+  ansible.builtin.shell: |
+    curl -sL https://rpm.nodesource.com/setup_10.x | sudo bash -
+
+# установка необходимых пакетов
+- name: "Install required dependencies for installing rbenv and ruby-build"
+  ansible.builtin.yum:
+    name:
+      - nodejs
+
+      - postgresql-devel #### Удалить, когда будет postgres
+      - libxml2-devel
+      - libxslt-devel 
+      - gcc
+      - gcc-c++
+      - kernel-devel
+      #############
+      - git-core
+      - zlib
+      - zlib-devel
+      - patch
+      - readline
+      - readline-devel
+      - libyaml-devel
+      - libffi-devel
+      - openssl-devel
+      - make
+      - bzip2
+      - autoconf
+      - automake
+      - libtool
+      - bison
+      - curl
+      - sqlite-devel
+    state: latest
+    update_cache: yes
+
+###### Установить ruby
+
+# проверка, если уже установлен, пропускать 
+- name: "Check install Ruby"
+  ansible.builtin.shell: ruby -v | awk '{print $1}'
+  register: ruby_status
+- debug:
+    var: ruby_status 
+
+# Скачавание и установка rbenv
+
+- name: "Install rbenv"
+  become: no
+  ansible.builtin.command:
+    chdir: "/home/vagrant"
+    cmd: "{{ item }}"
+  loop:
+    - git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+    - git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
+  #when: NOT ruby_status
+
+
+- name: "Export rbenv path into .bashrc"
+  become: no
+  ansible.builtin.shell: |
+    echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+
+    echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+
+    echo 'export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"' >> ~/.bashrc
+
+    source ~/.bashrc
+  args:
+    executable: /bin/bash
+  # when: 
+
+
+- name: "Install ruby 2.7"
+  become: no
+  ansible.builtin.command:
+    cmd: "{{ item }}"
+  loop:
+    - "rbenv install {{ ruby_version }}" #2.7.0
+    - "rbenv global {{ ruby_version }}" #2.7.0
+  # when:
+
+
+# создавть папку для прилоежния, если не существует /opt/app
+- name: "Create app directory - {{ app_work_directory }}"
+  ansible.builtin.file:
+    path: "{{ app_work_directory }}"
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: "0755"
+
+
+# скопировать папку с приложением в /opt/app
+- name: "Copy applications files into {{ app_work_directory }}"
+  ansible.builtin.copy:
+    src: files/
+    dest: "{{ app_work_directory }}/"
+    owner: vagrant
+    group: vagrant
+    mode: '0644'
+
+
+# # Сделать все бинарники исполняемыми
+# - name: "Make executable files in /bin"
+#   ansible.builtin.file:
+#     path: "{{ app_work_directory }}/bin/{{ item }}"
+#     mode: "0777"
+#   loop:
+#     - bundle
+#     - rails
+#     - rake
+#     - setup
+#     - spring
+#     - update
+#     - yarn
+
+
+# Сделаить симлинки на них в /usr/bin/
+
+
+# установить зависимости из каталога с приложением 
+# bundle config build.nokogiri --use-system-libraries
+# bundle install --clean --no-cache --without development
+# если не получиться, то запустить install так:
+# "bundle install --clean --no-cache --without development --gemfile={{ app_work_directory }}.Gemfile --path={{ app_work_directory }}"
+- name: "Istall dependencies"
+  become: no
+  ansible.builtin.command:
+    chdir: "{{ app_work_directory }}"
+    cmd: "{{ item }}"
+  loop:
+    # - 'gem install bundler -v "$(grep -A 1 "BUNDLED WITH" Gemfile.lock | tail -n 1)"'
+    - gem install bundler -v 1.16.2
+    # - "{{ app_work_directory }}/bin/bundle config build.nokogiri --use-system-libraries"
+    # - "{{ app_work_directory }}/bin/bundle install --clean  --no-cache --without development"
+
+    - "bundle config build.nokogiri --use-system-libraries"
+    - "bundle install --clean  --no-cache --without development"
+  ignore_errors: yes
+
+
+# скопировать из шаблона сервис systemd
+- name: "Copy service file"
+  ansible.builtin.template:
+    src: ruby-app.service.j2
+    dest: "/etc/systemd/system/{{ app_name }}.service"
+    owner: vagrant
+    group: vagrant
+    mode: "0644"
+
+# включить сервис и включить автозагрузку
+- name: "Service start"
+  ansible.builtin.service:
+    name: "{{ app_name }}"
+    state: started
+    enabled: yes

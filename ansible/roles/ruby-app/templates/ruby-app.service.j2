@@ -1,0 +1,25 @@
+[Unit]
+Description={{ app_name }}
+After=network.target
+ 
+[Service]
+Type=simple
+User=vagrant
+
+WorkingDirectory={{ app_work_directory }}
+
+ExecStart=bundle exec puma -b unix:///var/run/puma.sock -e $RAILS_ENV {{ app_work_directory }}/config.ru
+
+
+# ExecStart={{ app_work_directory }}/bin/bundle exec rake db:migrate && {{ app_work_directory }}/bin/bundle exec puma -b unix:///var/run/puma.sock -e $RAILS_ENV config.ru
+
+
+TimeoutSec=15
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+
+#bundle exec rake db:migrate && \
+#bundle exec puma -b unix:///var/run/puma.sock -e $RAILS_ENV config.ru

@@ -1,0 +1,33 @@
+---
+- name: Install the dependencies
+  yum:
+    name:
+      - centos-release-scl
+  when: ansible_distribution == 'CentOS'
+
+- name: Set script name and prefix
+  set_fact:
+    ruby_script_name: "{{ item.script }}"
+    ruby_prefix: "{{ item.prefix }}"
+  when: item.version == ruby_version
+  loop: "{{ ruby_version_script_mapping }}"
+
+- name: Install specified Ruby version
+  yum:
+    name:
+      - "{{ ruby_prefix }}"
+      - "{{ ruby_prefix }}-scldevel"
+      - "{{ ruby_prefix }}-ruby-devel"
+
+- name: Global profile script to enable specified ruby version
+  template:
+    src: "etc/profile.d/{{ ruby_script_name }}"
+    dest: /etc/profile.d/
+  when: ruby_install_globally
+
+- name: Per user profile script to enable specified ruby version
+  lineinfile:
+    path: "/home/{{ item }}/.bash_profile"
+    insertafter: EOF
+    line: "source scl_source enable {{ ruby_prefix }}"
+  loop: "{{ ruby_enable_users }}"
