@@ -38,20 +38,32 @@
 # bundle install --clean --no-cache --without development
 # если не получиться, то запустить install так:
 # "bundle install --clean --no-cache --without development --gemfile={{ app_work_directory }}.Gemfile --path={{ app_work_directory }}"
+
 - name: "Istall dependencies"
   become: no
-  ansible.builtin.command:
+  ansible.builtin.shell: 
+    cmd: |
+      gem install bundler -v 1.16.2
+      bundle config build.nokogiri --use-system-libraries
+      bundle install --clean  --no-cache --without development
     chdir: "{{ app_work_directory }}"
-    cmd: "{{ item }}"
-  loop:
-    # - 'gem install bundler -v "$(grep -A 1 "BUNDLED WITH" Gemfile.lock | tail -n 1)"'
-    - gem install bundler -v 1.16.2
-    # - "{{ app_work_directory }}/bin/bundle config build.nokogiri --use-system-libraries"
-    # - "{{ app_work_directory }}/bin/bundle install --clean  --no-cache --without development"
-
-    - "bundle config build.nokogiri --use-system-libraries"
-    - "bundle install --clean  --no-cache --without development"
   ignore_errors: yes
+
+
+# - name: "Istall dependencies"
+#   become: no
+#   ansible.builtin.command:
+#     chdir: "{{ app_work_directory }}"
+#     cmd: "{{ item }}"
+#   loop:
+#     # - 'gem install bundler -v "$(grep -A 1 "BUNDLED WITH" Gemfile.lock | tail -n 1)"'
+#     - gem install bundler -v 1.16.2
+#     # - "{{ app_work_directory }}/bin/bundle config build.nokogiri --use-system-libraries"
+#     # - "{{ app_work_directory }}/bin/bundle install --clean  --no-cache --without development"
+
+#     - "bundle config build.nokogiri --use-system-libraries"
+#     - "bundle install --clean  --no-cache --without development"
+#   ignore_errors: yes
 
 
 # скопировать из шаблона сервис systemd

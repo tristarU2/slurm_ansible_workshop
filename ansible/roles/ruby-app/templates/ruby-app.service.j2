@@ -8,7 +8,7 @@ User=vagrant
 
 WorkingDirectory={{ app_work_directory }}
 
-ExecStart=bundle exec puma -b unix:///var/run/puma.sock -e $RAILS_ENV {{ app_work_directory }}/config.ru
+ExecStart=/home/vagrant/.rbenv/shims/bundle exec puma -b unix:///var/run/puma.sock -e $RAILS_ENV {{ app_work_directory }}/config.ru
 
 # ExecStart={{ app_work_directory }}/bin/bundle exec rake db:migrate && {{ app_work_directory }}/bin/bundle exec puma -b unix:///var/run/puma.sock -e $RAILS_ENV config.ru
 
