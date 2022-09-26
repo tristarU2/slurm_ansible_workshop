@@ -33,12 +33,12 @@
 # проверка, если Ruby уже установлен 
 - name: "Check install Ruby"
   # become: no
-  ansible.builtin.shell: ruby -v | awk '{print $1}'
+  ansible.builtin.shell: ~/.rbenv/bin/ruby -v | awk '{print $1}'
   register: ruby_status
-- debug:
-    var: ruby_status
-- debug:
-    var: ruby_status.stdout
+# - debug:
+#     var: ruby_status
+# - debug:
+#     var: ruby_status.stdout
     
 
 # Скачавание и установка rbenv
@@ -71,13 +71,13 @@
 
 # Установка Ruby
 - name: "Install Ruby"
-  ansible.builtin.shell: /root/.rbenv/bin/rbenv install {{ ruby_version }}
+  ansible.builtin.shell: ~/.rbenv/bin/rbenv install {{ ruby_version }}
   args:
     executable: /bin/bash
   # when: ruby_status is defined and ruby_status.stdout != "ruby"
 
 - name: "Install global version Ruby"
-  ansible.builtin.command: rbenv global {{ ruby_version }}
+  ansible.builtin.command: ~/.rbenv/bin/rbenv global {{ ruby_version }}
   # when: ruby_status is defined and ruby_status.stdout != "ruby"
 
 
