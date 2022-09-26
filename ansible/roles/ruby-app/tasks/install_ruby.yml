@@ -32,7 +32,7 @@
 
 # проверка, если Ruby уже установлен 
 - name: "Check install Ruby"
-  become: no
+  # become: no
   ansible.builtin.shell: ruby -v | awk '{print $1}'
   register: ruby_status
 - debug:
@@ -42,34 +42,51 @@
     
 
 # Скачавание и установка rbenv
-- name: "Install rbenv"
-  become: no
-  ansible.builtin.command:
-    chdir: "/home/vagrant"
-    cmd: "{{ item }}"
+- name: "Install rbenv from GitHub"
+  ansible.builtin.git:
+    repo: "{{ item.repo }}"
+    dest: "{{ item.dest }}"
   loop:
-    - git clone https://github.com/rbenv/rbenv.git ~/.rbenv
-    - git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
-  when: ruby_status is defined and ruby_status.stdout != "ruby"
+    - repo: https://github.com/rbenv/rbenv.git
+      dest: ~/.rbenv
+    - repo: https://github.com/rbenv/ruby-build.git
+      dest: ~/.rbenv/plugins/ruby-build
+  # when: ruby_status is defined and ruby_status.stdout != "ruby"
 
 
 - name: "Export rbenv path into .bashrc"
-  become: no
-  ansible.builtin.shell: |
-    echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
-    echo 'eval "$(rbenv init -)"' >> ~/.bashrc
-    echo 'export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"' >> ~/.bashrc
-    source ~/.bashrc
-  # args:
-  #   executable: /bin/bash
-  when: ruby_status is defined and ruby_status.stdout != "ruby"
+  ansible.builtin.blockinfile:
+    path: ~/.bashrc
+    marker: "######### Ruby bin ###########"
+    block: |
+      export PATH="$HOME/.rbenv/bin:$PATH"
+      eval "$(rbenv init -)"
+      export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"
+    state: present
+  # when: ruby_status is defined and ruby_status.stdout != "ruby"
+
+- name: "source /root/.bashrc"
+  ansible.builtin.raw: source /root/.bashrc
+  # when: ruby_status is defined and ruby_status.stdout != "ruby"
 
 # Установка Ruby
 - name: "Install Ruby"
-  become: no
-  ansible.builtin.command:
-    cmd: "{{ item }}"
-  loop:
-    - "rbenv install {{ ruby_version }}"
-    - "rbenv global {{ ruby_version }}"
-  when: ruby_status is defined and ruby_status.stdout != "ruby"
+  ansible.builtin.shell: /root/.rbenv/bin/rbenv install {{ ruby_version }}
+  args:
+    executable: /bin/bash
+  # when: ruby_status is defined and ruby_status.stdout != "ruby"
+
+- name: "Install global version Ruby"
+  ansible.builtin.command: rbenv global {{ ruby_version }}
+  # when: ruby_status is defined and ruby_status.stdout != "ruby"
+
+
+# # Установка Ruby
+# - name: "Install Ruby"
+#   become: no
+#   ansible.builtin.command:
+#     cmd: "{{ item }}"
+#   loop:
+#     - "rbenv install {{ ruby_version }}"
+#     - "rbenv global {{ ruby_version }}"
+#   when: ruby_status is defined and ruby_status.stdout != "ruby"

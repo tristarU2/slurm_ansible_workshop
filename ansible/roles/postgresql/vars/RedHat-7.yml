@@ -1,0 +1,31 @@
+---
+# vars file for postgresql
+__postgresql_version: "9.2"
+__postgresql_data_dir: "/var/lib/pgsql/data"
+__postgresql_bin_path: "/usr/bin"
+__postgresql_config_path: "/var/lib/pgsql/data"
+__postgresql_daemon: postgresql
+__postgresql_packages:
+  - postgresql
+  - postgresql-server
+  - postgresql-contrib
+  - postgresql-libs
+
+# Databases to ensure exist.
+postgresql_databases:
+  - name: slurmdb # required; the rest are optional
+
+# Users to ensure exist.
+postgresql_users:
+  - name: slurm #required; the rest are optional
+    password: Slurm12345 # defaults to not set
+
+postgresql_hba_entries:
+  - {type: local, database: all, user: postgres, auth_method: peer}
+  - {type: local, database: all, user: all, auth_method: peer}
+  - {type: host, database: all, user: all, address: '127.0.0.1/32', auth_method: "{{ postgresql_auth_method }}"}
+
+  - {type: host, database: all, user: all, address: '0.0.0.0/0', auth_method: "{{ postgresql_auth_method }}"}
+
+  - {type: host, database: all, user: all, address: '::1/128', auth_method: "{{ postgresql_auth_method }}"}
+  

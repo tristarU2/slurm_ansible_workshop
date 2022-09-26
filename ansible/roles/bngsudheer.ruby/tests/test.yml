@@ -1,7 +1,0 @@
----
-- hosts: localhost
-  remote_user: root
-  vars:
-    ruby_version: 2.4
-  roles:
-    - role_under_test

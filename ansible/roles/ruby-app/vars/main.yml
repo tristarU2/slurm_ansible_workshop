@@ -16,8 +16,8 @@ os_env:
   - key: DB_PORT
     value: 5432
   - key: DB_NAME
-    value: slurm
+    value: slurmdb
   - key: DB_USER
-    value: postgres
+    value: slurm
   - key: DB_PASSWORD
-    value: postgres
+    value: Slurm12345
