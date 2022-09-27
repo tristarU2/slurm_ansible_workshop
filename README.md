@@ -12,4 +12,5 @@
 
 #### Команда `bundle install --clean  --no-cache --without development` выполняется **успешно**, однако ее вывод (предупреждение) ansible считает ошибкой. Сделал `ignore_errors: yes`
 
-
+#### В файле /ets/hosts добавить
+`192.168.56.101  ruby-app.com`
