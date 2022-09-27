@@ -11,17 +11,66 @@
   import_tasks: install_ruby.yml
 
 - name: "Tasks with install ruby application"
-  include_tasks: install_app.yml
+  import_tasks: install_app.yml
 
+
+
+
+
+
+
+# # создать папку для приложения, если не существует /opt/app
+# - name: "111"
+#   ansible.builtin.file:
+#     path: "{{ app_work_directory }}"
+#     state: directory
+#     # owner: vagrant
+#     # group: vagrant
+#     mode: "0644"
+
+
+# # скопировать папку с приложением в /opt/app
+# - name: "Copy applications files into {{ app_work_directory }}"
+#   ansible.builtin.copy:
+#     src: files/
+#     dest: "{{ app_work_directory }}/"
+#     # owner: vagrant
+#     # group: vagrant
+#     mode: '0644'
+
+
+
+# - name: "Install bundler & dependencies"
+#   ansible.builtin.command: "{{ item }}"
+#   args:
+#     chdir: "{{ app_work_directory }}"
+#   loop:
+#     - "~/.rbenv/shims/gem install bundler -v 1.16.2"
+#     - "~/.rbenv/shims/bundle config build.nokogiri --use-system-libraries"
+#     - "~/.rbenv/shims/bundle install --clean  --no-cache --without development"
+#   ignore_errors: yes
+
+# # - name: "Install bundler & dependencies"
+# #   # become: no
+# #   ansible.builtin.shell: 
+# #     cmd: |
+# #       bundle config build.nokogiri --use-system-libraries
+# #       bundle install --clean  --no-cache --without development
+# #     chdir: "{{ app_work_directory }}"
+# #   args:
+# #     executable: /bin/sh
+# #   # ignore_errors: yes
+  
 
 # # скопировать из шаблона сервис systemd
 # - name: "Copy service file"
 #   ansible.builtin.template:
 #     src: ruby-app.service.j2
 #     dest: "/etc/systemd/system/{{ app_name }}.service"
-#     owner: vagrant
-#     group: vagrant
-#     mode: "0644"
+#     # owner: vagrant
+#     # group: vagrant
+#     mode: "0755"
+
 
 # # включить сервис и включить автозагрузку
 # - name: "Service start"
@@ -29,3 +78,33 @@
 #     name: "{{ app_name }}"
 #     state: started
 #     enabled: yes
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# скопировать из шаблона сервис systemd
+- name: "Copy service file"
+  ansible.builtin.template:
+    src: ruby-app.service.j2
+    dest: "/etc/systemd/system/{{ app_name }}.service"
+    mode: "0755"
+
+# включить сервис и включить автозагрузку
+- name: "Service start"
+  ansible.builtin.service:
+    name: "{{ app_name }}"
+    state: started
+    enabled: yes
+

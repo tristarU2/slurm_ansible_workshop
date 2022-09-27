@@ -5,12 +5,13 @@ After=network.target
 [Service]
 Type=simple
 
+EnvironmentFile=/etc/environment
+
 WorkingDirectory={{ app_work_directory }}
+ExecStartPre=/root/.rbenv/shims/bundle exec rake db:migrate
+ExecStart=/root/.rbenv/shims/bundle exec puma -b unix:///var/run/puma.sock -e $RAILS_ENV {{ app_work_directory }}/config.ru
 
-ExecStart=bundle exec puma -b unix:///var/run/puma.sock -e $RAILS_ENV bundle {{ app_work_directory }}/config.ru
-
-
-TimeoutSec=10
+TimeoutSec=5
 Restart=always
 
 [Install]

@@ -2,23 +2,24 @@
 - name: "Install Nginx, Postgres & Ruby app on CentOS 7"
   hosts: all
   become: yes
-  # vars:
-    # ruby_version: 2.6.0
-    # app_name: "ruby_app"
-    # app_work_directory: "/opt/app"
+
 
   roles:
     # - python3
-    # - nginxinc.nginx
+    - ansible-role-nginx
     - postgresql
     - ruby-app
-  
-  # tasks:
-  # - name: "Copy nginx.conf"
-  # # ansible/roles/ruby-app/files/config/nginx.conf
-  #   ansible.builtin.copy:
-  # - name: "Reload Nginx"
     
-  #   service:
-  #     name: "nginx"
-  #     state: "reloaded"
+
+  tasks:
+  - name: "Copy nginx.conf"
+    ansible.builtin.copy:
+      src: roles/ruby-app/files/config/nginx.conf
+      dest: /etc/nginx/nginx.conf
+      mode: 0644
+
+
+  - name: "Reload Nginx"
+    ansible.builtin.service:
+      name: nginx
+      state: reloaded

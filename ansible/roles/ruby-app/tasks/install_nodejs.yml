@@ -8,5 +8,5 @@
   ansible.builtin.yum:
     name:
       - nodejs
-    state: latest
+    state: present
     update_cache: yes
