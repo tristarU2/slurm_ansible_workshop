@@ -62,7 +62,7 @@
   when: ruby_status is defined and ruby_status.stdout != "ruby"
 
 # Установка Ruby
-- name: "Install Ruby"
+- name: "Install Ruby {{ ruby_version }}"
   ansible.builtin.command: ~/.rbenv/bin/rbenv install {{ ruby_version }}
   when: ruby_status is defined and ruby_status.stdout != "ruby"
 
