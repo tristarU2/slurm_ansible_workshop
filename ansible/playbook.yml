@@ -3,21 +3,17 @@
   hosts: all
   become: yes
 
-
   roles:
-    # - python3
     - ansible-role-nginx
     - postgresql
     - ruby-app
     
-
   tasks:
   - name: "Copy nginx.conf"
     ansible.builtin.copy:
       src: roles/ruby-app/files/config/nginx.conf
       dest: /etc/nginx/nginx.conf
       mode: 0644
-
 
   - name: "Reload Nginx"
     ansible.builtin.service:

@@ -24,7 +24,6 @@
     - "~/.rbenv/shims/bundle install --clean  --no-cache --without development"
   ignore_errors: yes
   
-  
 # скопировать из шаблона сервис systemd
 - name: "Copy service file"
   ansible.builtin.template:
@@ -33,7 +32,6 @@
     owner: vagrant
     group: vagrant
     mode: "0644"
-
 
 # включить сервис и включить автозагрузку
 - name: "Service start"

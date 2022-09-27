@@ -29,13 +29,11 @@
     state: present
     update_cache: yes
 
-
 # проверка, если Ruby уже установлен 
 - name: "Check install Ruby"
   ansible.builtin.shell: ~/.rbenv/bin/ruby -v | awk '{print $1}'
   register: ruby_status
     
-
 # Скачавание и установка rbenv
 - name: "Install rbenv from GitHub"
   ansible.builtin.git:
@@ -47,7 +45,6 @@
     - repo: https://github.com/rbenv/ruby-build.git
       dest: ~/.rbenv/plugins/ruby-build
   when: ruby_status is defined and ruby_status.stdout != "ruby"
-
 
 - name: "Export rbenv path into .bashrc"
   ansible.builtin.blockinfile:
@@ -67,13 +64,9 @@
 # Установка Ruby
 - name: "Install Ruby"
   ansible.builtin.command: ~/.rbenv/bin/rbenv install {{ ruby_version }}
-  # args:
-  #   executable: /bin/bash
   when: ruby_status is defined and ruby_status.stdout != "ruby"
 
 - name: "Install global version Ruby"
   ansible.builtin.command: ~/.rbenv/bin/rbenv global {{ ruby_version }}
-  # args:
-  #   executable: /bin/bash
   when: ruby_status is defined and ruby_status.stdout != "ruby"
 
