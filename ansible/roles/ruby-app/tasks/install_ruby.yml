@@ -2,7 +2,7 @@
 - name: "Install required dependencies for installing rbenv and ruby-build"
   ansible.builtin.yum:
     name:
-      # - postgresql-devel #### Удалить, когда будет postgres
+      - postgresql-devel
       - libxml2-devel
       - libxslt-devel 
       - gcc
